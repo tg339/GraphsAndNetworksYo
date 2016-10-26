@@ -105,19 +105,24 @@ object GraphOps {
   def contagiousInfection(graph: Graph, numEarlyAdopters: Int, contagionThreshold: Double): mutable.Set[Int] = {
     // Create queue of early adopters
     val adopters = mutable.Set(Random.shuffle(graph.nodes.toSeq).take(numEarlyAdopters).map(_.id): _*)
-    val q: mutable.Queue[Int] = mutable.Queue(adopters.toSeq: _*)
+    var adoptersIt = mutable.Set[Int]()
+    val q: mutable.Queue[Int] = mutable.Queue(graph.nodes.toSeq.map(_.id): _*)
     val visited = mutable.Set[Int]()
 
-    while(q.nonEmpty) {
-      val node = q.dequeue()
-      visited.add(node)
-      var infectedNeighbors = 0
-      val nodeNeighbors = graph.neighborhoods(node)
-      nodeNeighbors.foreach(n => {
-        if(!visited.contains(n.id)) q.enqueue(n.id)
-        if(adopters.contains(n.id)) infectedNeighbors = infectedNeighbors + 1
-      })
-      if (infectedNeighbors.toDouble / nodeNeighbors.size >= contagionThreshold) adopters.add(node)
+    breakable {
+      while(q.nonEmpty) {
+        adoptersIt = adopters.clone()
+        val node = q.dequeue()
+        visited.add(node)
+        var infectedNeighbors = 0
+        val nodeNeighbors = graph.neighborhoods(node)
+        nodeNeighbors.foreach(n => {
+          q.enqueue(n.id)
+          if(adopters.contains(n.id)) infectedNeighbors = infectedNeighbors + 1
+        })
+        if (infectedNeighbors.toDouble / nodeNeighbors.size >= contagionThreshold) adopters.add(node)
+        if (adoptersIt == adopters) break
+      }
     }
     adopters
   }
