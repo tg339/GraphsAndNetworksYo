@@ -12,7 +12,7 @@ object GraphOps {
   }
 
 
-  def breadthFirstSearch(graph: Graph, startNode: Node, targetNode: Node): List[Int] = {
+  def breadthFirstSearch(graph: GraphLike, startNode: Node, targetNode: Node): List[Int] = {
     val parents: mutable.Map[Int, Int] = mutable.Map.empty
     val q: mutable.Queue[Node] = new mutable.Queue
     var path: List[Int] = List()
@@ -46,9 +46,9 @@ object GraphOps {
     path
   }
 
-  def maxFlow(graph: Graph, startNode: Node, targetNode: Node): Int = {
+  def maxFlow(graph: GraphLike, startNode: Node, targetNode: Node): Int = {
     var maxFlow = 0
-    var g: Option[Graph] = Some(graph)
+    var g: Option[GraphLike] = Some(graph)
 
     while(g.isDefined) {
       val graphMinCPair = maxFlowIteration(g.get, startNode, targetNode)
@@ -62,7 +62,7 @@ object GraphOps {
     maxFlow
   }
 
-  def maxFlowIteration(graph: Graph, startNode: Node, targetNode: Node): Option[(Graph, Int)] = {
+  def maxFlowIteration(graph: GraphLike, startNode: Node, targetNode: Node): Option[(GraphLike, Int)] = {
     // Find a path
     val pathSlider = graph.path(startNode, targetNode).sliding(2)
     val path = pathSlider.map(x => graph.getEdge(x.last, x.head).get).toList
@@ -102,7 +102,7 @@ object GraphOps {
     }
   }
 
-  def contagiousInfection(graph: Graph, numEarlyAdopters: Int, contagionThreshold: Double): mutable.Set[Int] = {
+  def contagiousInfection(graph: GraphLike, numEarlyAdopters: Int, contagionThreshold: Double): mutable.Set[Int] = {
     // Create queue of early adopters
     val adopters = mutable.Set(Random.shuffle(graph.nodes.toSeq).take(numEarlyAdopters).map(_.id): _*)
     var adoptersIt = mutable.Set[Int]()

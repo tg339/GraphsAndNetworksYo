@@ -3,6 +3,26 @@ import scala.util.Random
 import GraphOps.{maxFlowIteration, maxFlow, contagiousInfection}
 
 object Main extends App {
+  val g = GraphFactories.testGraph1
+  // Acceptability graph
+  println(g.acceptabilityGraph.getEdges.keySet)
+
+  // Induced prefered graph
+  println(g.inducedPreferredGraph.getEdges.keySet)
+}
+
+object HW1 {
+  //  val g = GraphFactories.fromNumberAndProb(1000, .5F)
+  //  println(g.findShortestPathBFS())
+  //
+  //  println(GraphFactories.runTest(g, 10000))
+
+  //  val testGraphs = (0.0 to 1.0 by .01).foreach( x => {
+  //    println((x, GraphFactories.runTest(GraphFactories.fromNumberAndProb(1000,x.toFloat), 400)))
+  //  })
+}
+
+object HW2 {
   val graph = GraphFactories.fromFile("/Users/timdelisle/Downloads/facebook_combined.txt")
 
   println("total number of edges in directed graph")
@@ -39,8 +59,8 @@ object Main extends App {
     val infected = contagiousInfection(graph, k, q)
     println(infected.size, k, q)
   })
-//
-//  // 4.12.c
+  //
+  //  // 4.12.c
   val qs = 0.0 to 0.5 by .05
   val ks = 0 to 250 by 10
 
@@ -54,15 +74,4 @@ object Main extends App {
     val infected = contagiousInfection(graph, k, q)
     println(infected.size, k, q)
   })
-}
-
-object HW1 {
-  //  val g = GraphFactories.fromNumberAndProb(1000, .5F)
-  //  println(g.findShortestPathBFS())
-  //
-  //  println(GraphFactories.runTest(g, 10000))
-
-  //  val testGraphs = (0.0 to 1.0 by .01).foreach( x => {
-  //    println((x, GraphFactories.runTest(GraphFactories.fromNumberAndProb(1000,x.toFloat), 400)))
-  //  })
 }

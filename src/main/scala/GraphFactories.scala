@@ -5,7 +5,41 @@ import com.github.tototoshi.csv.{CSVReader, DefaultCSVFormat}
 /**
   * Created by timdelisle on 10/23/16.
   */
+
+/**
+  * Node ID reference to fig 7.3
+  * --------
+  * PA: 0 {4,12,5}
+  * PB: 1 {7,10,9}
+  * PC: 2 {7,7,10}
+  *
+  * H1: 3 price: 5
+  * H2: 4 price: 8
+  * H3: 5 price: 6
+  */
 object GraphFactories {
+  def testGraph1 = {
+    val nodes = Seq(Node(1),Node(2),Node(3),Node(4),Node(5),Node(6))
+
+    val buyers: Map[Node, Map[Node, Float]] = Map(
+      nodes(0) -> Map(nodes(3) -> 4, nodes(4) -> 12, nodes(5) -> 5),
+      nodes(1) -> Map(nodes(3) -> 7, nodes(4) -> 10, nodes(5) -> 9),
+      nodes(2) -> Map(nodes(3) -> 7, nodes(4) -> 7, nodes(5) -> 10)
+    )
+    val items: Map[Node, Float] = Map(
+      nodes(3) -> 5,
+      nodes(4) -> 8,
+      nodes(5) -> 6
+    )
+
+    val nodeSplits = nodes.splitAt(3)
+    val pairs = for (x <- nodeSplits._1; y <- nodeSplits._2) yield (x,y)
+    val edges = pairs.map(e => (e._1.id, e._2.id) -> Edge(e._1, e._2, 0,0)).toMap
+
+    new Matching(buyers, items, edges)
+  }
+
+
   def simpleTestGraphs = {
     val nodes = Set((0 to 3).map(Node): _*)
     val edges = Map(
@@ -51,22 +85,4 @@ object GraphFactories {
 
     new Graph(singleNodes, combos.map(x => (x.to.id, x.from.id) -> x).toMap)
   }
-
-//  def runTest(g: Graph, maxTimes: Int) = {
-//    val r = scala.util.Random
-//
-//    val timesToRun = (1 to maxTimes).toList.par
-//
-//    val results = timesToRun.map(x => {
-//      val startIdx = r.nextInt(g.nodes.toVector.length)
-//      val endIdx = r.nextInt(g.nodes.toVector.length)
-//
-//      val pathLength = g.findShortestPathBFS(g.nodes.toVector(startIdx), g.nodes.toVector(endIdx)) match {
-//        case Nil => 20
-//        case x: List[String] => x.length
-//      }
-//      (g.nodes.toVector(startIdx), g.nodes.toVector(endIdx), pathLength)
-//    })
-//    results.map(_._3).sum.toDouble/results.length.toDouble
-//  }
 }
