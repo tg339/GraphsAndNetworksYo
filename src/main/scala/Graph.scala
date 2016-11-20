@@ -38,6 +38,22 @@ class Matching(buyers: Map[Node, Map[Node, Float]], items: Map[Node, Float], edg
   val getEdges = edges
   var neighborhoods: Map[Int, Set[Node]] = edges.values.toList.groupBy(_.from.id).mapValues[Set[Node]](x => x.map(_.to).toSet)
 
+  // Adds a source and target node to the bypartite graph
+  def getAugmentedGraph: Matching = {
+    val sourceNode = Node(0)
+    val buyerEdges = this.buyers
+      .flatMap(n => List(Edge(sourceNode, n._1, 0, 1.0), Edge(n._1, sourceNode, 0, 1.0)))
+      .map(n => n.ref -> n)
+      .toMap
+
+    val targetNode = Node(10)
+    val sellerEdges: Map[(Int, Int), Edge] = this.items
+      .flatMap(n => List(Edge(targetNode, n._1, 0, 1.0), Edge(n._1, targetNode, 0, 1.0)))
+      .map(n => n.ref -> n)
+      .toMap
+    new Matching(this.buyers, this.items, edges ++ buyerEdges ++ sellerEdges)
+  }
+
   // Substract the price from the utility for the item
   def getUtility(buyer: Node, item: Node) = buyers(buyer)(item) - items(item)
   def getPreferredChoice(buyer: Node): Node = {
@@ -70,5 +86,7 @@ class Matching(buyers: Map[Node, Map[Node, Float]], items: Map[Node, Float], edg
 
 
 case class Node(id: Int)
-case class Edge(from: Node, to: Node, capacity: Int, weight: Double)
+case class Edge(from: Node, to: Node, capacity: Int, weight: Double) {
+  val ref = (from.id, to.id)
+}
 case class Path(nodes: List[Int], distance: Double)
