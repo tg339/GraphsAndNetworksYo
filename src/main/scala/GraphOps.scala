@@ -46,7 +46,63 @@ object GraphOps {
     path
   }
 
-  def maxFlow(graph: GraphLike, startNode: Node, targetNode: Node): Int = {
+  // Can be used to find a constricted set
+  def connectedComponents(graph: GraphLike, startNode: Node): mutable.Set[Int] = {
+    val q: mutable.Queue[Node] = new mutable.Queue
+    val visited: mutable.Set[Int] = mutable.Set().empty
+
+    q.enqueue(startNode)
+
+    breakable {
+      while (q.nonEmpty) {
+        val node = q.dequeue()
+        visited.add(node.id)
+        graph.neighborhoods.get(node.id) match {
+          case Some(neighbors) => neighbors.foreach(neighbor => {
+            if(!visited.contains(neighbor.id)) {
+              visited.add(neighbor.id)
+              q.enqueue(neighbor)
+            }
+          })
+          case None => break
+        }
+      }
+    }
+    visited
+  }
+
+  def getMarketEquilibrium(graph: Matching): Matching = {
+    var startingItems = graph.items.map(x => x._1 -> 0.0F)
+    val startingGraph = new Matching(graph.buyers, startingItems, graph.getEdges)
+    var g = startingGraph.inducedPreferredGraph.getAugmentedGraph
+
+
+    var maxFlow = GraphOps.maxFlow(g, g.getNode(0).get, g.getNode(10).get)
+    breakable {
+      while(maxFlow._1 != startingItems.size) {
+        val sellersConSet = GraphOps.getConstrictedSet(g, GraphOps.connectedComponents(g, g.getNode(0).get))
+        val tmp = startingItems.filterNot(x => sellersConSet.keySet.contains(x._1))
+        val updatedSellersConSet = sellersConSet.map(x => (x._1, x._2 + 1))
+        println(updatedSellersConSet)
+        startingItems = tmp ++ updatedSellersConSet
+
+        if(startingItems.count(_._2 > 0) == startingItems.size) {
+          println("shit")
+          startingItems = startingItems.map(i => (i._1, i._2 - 1 ))
+        }
+        val tmpG = new Matching(graph.buyers, startingItems, graph.getEdges)
+        g = tmpG.inducedPreferredGraph.getAugmentedGraph
+        maxFlow = GraphOps.maxFlow(g, g.getNode(0).get, g.getNode(10).get)
+      }
+    }
+    new Matching(graph.buyers, startingItems, graph.getEdges)
+  }
+
+  def getConstrictedSet(graph: Matching, connectedComponent: mutable.Set[Int]) = {
+    graph.items.filter(s => connectedComponent.contains(s._1.id))
+  }
+
+  def maxFlow(graph: GraphLike, startNode: Node, targetNode: Node): (Int, Option[GraphLike]) = {
     var maxFlow = 0
     var g: Option[GraphLike] = Some(graph)
 
@@ -59,15 +115,15 @@ object GraphOps {
         case None => g = None
       }
     }
-    maxFlow
+    (maxFlow, g)
   }
 
   def maxFlowIteration(graph: GraphLike, startNode: Node, targetNode: Node): Option[(GraphLike, Int)] = {
     // Find a path
     val pathSlider = graph.path(startNode, targetNode).sliding(2)
     val path = pathSlider.map(x => graph.getEdge(x.head, x.last).get).toList
-    println(graph.getEdges)
-    println(path)
+//    println(graph.getEdges)
+//    println(path)
     path match {
       case Nil => None
       case _ =>
@@ -91,17 +147,17 @@ object GraphOps {
           }
           Edge(edge.from, edge.to, currentCap - minCap, 1)
         }).filter(_.capacity > 0)
-        println("path")
-        println(pathAugmentation)
 
         // Update the edges to include all new edges
         // Make sure not to duplicate the edges
+
         if(newPath.nonEmpty) {
-          newPath.foreach(e => edges + ((e.from.id, e.to.id) -> e))
+          newPath.foreach(e => edges = edges + ((e.from.id, e.to.id) -> e))
         }
         if(pathAugmentation.nonEmpty) {
-          pathAugmentation.foreach(e => edges + ((e.from.id, e.to.id) -> e))
+          pathAugmentation.foreach(e => edges = edges + ((e.from.id, e.to.id) -> e))
         }
+
         // Return the new graph
         Some((new Graph(graph.nodes, edges), minCap))
     }

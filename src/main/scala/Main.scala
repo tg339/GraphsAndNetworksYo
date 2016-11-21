@@ -3,10 +3,14 @@ import scala.util.Random
 import GraphOps.{maxFlowIteration, maxFlow, contagiousInfection}
 
 object Main extends App {
-  val g = GraphFactories.maxFlowTestGraph
+  val g = GraphFactories.testGraph1
+//  print(g.inducedPreferredGraph)
 //  println(g.getNode(3))
-  println(GraphOps.maxFlow(g, g.getNode(0).get, g.getNode(3).get))
-  g.getEdges.foreach(println)
+//  println(GraphOps.maxFlow(g, g.getNode(0).get, g.getNode(10).get))
+//  println(GraphOps.getConstrictedSet(g, GraphOps.connectedComponents(g, g.getNode(0).get)))
+  val marketEq = GraphOps.getMarketEquilibrium(g)
+  println("market Items yo")
+  println(marketEq.items)
   // Acceptability graph
 //  println(g.acceptabilityGraph.getEdges.keySet)
 
@@ -53,7 +57,7 @@ object HW2 {
     val startNode: Int = Random.nextInt(graphClone.nodes.size)
     val endNode: Int = Random.nextInt(graphClone.nodes.size)
     val maxFlowNumber = maxFlow(graphClone, graphClone.nodes.toArray.apply(startNode), graphClone.nodes.toArray.apply(endNode))
-    totalEdgeDisjoints += maxFlowNumber
+    totalEdgeDisjoints += maxFlowNumber._1
     println(maxFlowNumber)
   })
   println(s"Average for ${maxInt}: ")

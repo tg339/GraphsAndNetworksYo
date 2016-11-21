@@ -33,7 +33,7 @@ class BipartiteGraph(x: Set[Node], y: Set[Node], edges: Map[(Int, Int), Edge]) e
 }
 
 
-class Matching(buyers: Map[Node, Map[Node, Float]], items: Map[Node, Float], edges: Map[(Int, Int), Edge]) extends GraphLike {
+class Matching(val buyers: Map[Node, Map[Node, Float]], val items: Map[Node, Float], edges: Map[(Int, Int), Edge]) extends GraphLike {
   val nodes: Set[Node] = buyers.keySet ++ items.keySet ++ edges.map(_._2.to) ++ edges.map(_._2.from)
   val getEdges = edges
   var neighborhoods: Map[Int, Set[Node]] = edges.values.toList.groupBy(_.from.id).mapValues[Set[Node]](x => x.map(_.to).toSet)

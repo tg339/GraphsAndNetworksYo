@@ -39,6 +39,27 @@ object GraphFactories {
     new Matching(buyers, items, edges)
   }
 
+  def testGraph2 = {
+    val nodes = Seq(Node(1),Node(2),Node(3),Node(4),Node(5),Node(6))
+
+    val buyers: Map[Node, Map[Node, Float]] = Map(
+      nodes(0) -> Map(nodes(3) -> 10, nodes(4) -> 0, nodes(5) -> 0),
+      nodes(1) -> Map(nodes(3) -> 0, nodes(4) -> 12, nodes(5) -> 0),
+      nodes(2) -> Map(nodes(3) -> 0, nodes(4) -> 12, nodes(5) -> 0)
+    )
+    val items: Map[Node, Float] = Map(
+      nodes(3) -> 10,
+      nodes(4) -> 12,
+      nodes(5) -> 1000
+    )
+
+    val nodeSplits = nodes.splitAt(3)
+    val pairs = for (x <- nodeSplits._1; y <- nodeSplits._2) yield (x,y)
+    val edges = pairs.map(e => (e._1.id, e._2.id) -> Edge(e._1, e._2, 0,0)).toMap
+
+    new Matching(buyers, items, edges)
+  }
+
   def maxFlowTestGraph = {
     val nodes = Seq(Node(0), Node(1), Node(2), Node(3))
     val edges: Map[(Int,Int), Edge] = Map (
@@ -47,6 +68,21 @@ object GraphFactories {
       (0,2) -> Edge(nodes(0),nodes(2),3,0.0),
       (1,2) -> Edge(nodes(1),nodes(2),2,0.0),
       (2,3) -> Edge(nodes(2),nodes(3),1,0.0)
+    )
+    new Graph(nodes.toSet, edges)
+  }
+
+  def secondTestGraph = {
+    val nodes = Seq(Node(0), Node(1), Node(2), Node(3),Node(4))
+    val edges: Map[(Int,Int), Edge] = Map(
+      (0,1) -> Edge(Node(0),Node(1),1,1.0),
+      (0,2) -> Edge(Node(0),Node(2),2,1.0),
+      (0,3) -> Edge(Node(0),Node(3),3,1.0),
+      (1,4) -> Edge(Node(1),Node(4),1,1.0),
+      (1,2) -> Edge(Node(1),Node(2),2,1.0),
+      (2,4) -> Edge(Node(2),Node(4),2,1.0),
+      (2,3) -> Edge(Node(2),Node(3),1,1.0),
+      (3,4) -> Edge(Node(3),Node(4),1,1.0)
     )
     new Graph(nodes.toSet, edges)
   }
