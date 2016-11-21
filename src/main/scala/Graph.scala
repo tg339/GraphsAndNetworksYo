@@ -40,18 +40,35 @@ class Matching(buyers: Map[Node, Map[Node, Float]], items: Map[Node, Float], edg
 
   // Adds a source and target node to the bypartite graph
   def getAugmentedGraph: Matching = {
+    def makeInfCapacityEdges(edges: Map[(Int,Int), Edge]): Map[(Int,Int), Edge] = {
+      edges.map(e => e._1 -> e._2.setCap(Int.MaxValue))
+        .flatMap(n => List(n, n._2.ref.swap -> n._2.getReverse))
+    }
+
+    def genDirectedEdges(edges: Map[(Int,Int), Edge]): Map[(Int,Int), Edge] = {
+      edges.flatMap(n => List(n, n._2.ref.swap -> n._2.getReverse))
+    }
+
+    // Gen edges from source to buyers
+    // Capacity is one fo reach of these edges
+    val edgeCap = 1
     val sourceNode = Node(0)
     val buyerEdges = this.buyers
-      .flatMap(n => List(Edge(sourceNode, n._1, 0, 1.0), Edge(n._1, sourceNode, 0, 1.0)))
+      .map(n =>  Edge(sourceNode, n._1, edgeCap, 1.0))
       .map(n => n.ref -> n)
       .toMap
 
+    // Gen Edges from items to target
     val targetNode = Node(10)
     val sellerEdges: Map[(Int, Int), Edge] = this.items
-      .flatMap(n => List(Edge(targetNode, n._1, 0, 1.0), Edge(n._1, targetNode, 0, 1.0)))
+      .map(n =>  Edge(n._1, targetNode, edgeCap, 1.0))
       .map(n => n.ref -> n)
       .toMap
-    new Matching(this.buyers, this.items, edges ++ buyerEdges ++ sellerEdges)
+    new Matching(
+      this.buyers,
+      this.items,
+      genDirectedEdges(makeInfCapacityEdges(edges)) ++ buyerEdges ++ sellerEdges
+    )
   }
 
   // Substract the price from the utility for the item
@@ -61,6 +78,7 @@ class Matching(buyers: Map[Node, Map[Node, Float]], items: Map[Node, Float], edg
     val utilities = items.map(i => (i, getUtility(buyer, i))).toSeq
     utilities.maxBy(_._2)._1
   }
+
   def acceptabilityGraph: Matching = {
     val acceptable = edges.filter(e =>  {
       val buyer = this.getNode(e._1._1)
@@ -88,5 +106,11 @@ class Matching(buyers: Map[Node, Map[Node, Float]], items: Map[Node, Float], edg
 case class Node(id: Int)
 case class Edge(from: Node, to: Node, capacity: Int, weight: Double) {
   val ref = (from.id, to.id)
+  def setCap(cap: Int) = {
+    Edge(from, to, cap, weight)
+  }
+  def getReverse = {
+    Edge(to, from, capacity, weight)
+  }
 }
 case class Path(nodes: List[Int], distance: Double)

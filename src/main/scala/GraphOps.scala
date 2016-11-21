@@ -65,7 +65,9 @@ object GraphOps {
   def maxFlowIteration(graph: GraphLike, startNode: Node, targetNode: Node): Option[(GraphLike, Int)] = {
     // Find a path
     val pathSlider = graph.path(startNode, targetNode).sliding(2)
-    val path = pathSlider.map(x => graph.getEdge(x.last, x.head).get).toList
+    val path = pathSlider.map(x => graph.getEdge(x.head, x.last).get).toList
+    println(graph.getEdges)
+    println(path)
     path match {
       case Nil => None
       case _ =>
@@ -73,29 +75,32 @@ object GraphOps {
         val minCap = path.minBy(_.capacity).capacity
         // Get the edges and remove the ones on the path
         var edges = graph.getEdges
-        path.foreach(e => edges = graph.getEdges - ((e.to.id, e.from.id)))
+        path.foreach(e => edges = graph.getEdges - ((e.from.id, e.to.id)))
 
         // List to add new nodes that might need to be created
         var pathAugmentation: Set[Edge] = Set()
+
         // For each edge in the path reduce flow by min cap
         // Get the node reverse edge and increment its flow. If it doesn't exist create a new edge
         // Finally filter out any nodes with zero cap
         val newPath = path.map( edge => {
           val currentCap = edge.capacity
           graph.getEdge(edge.to.id, edge.from.id) match {
-            case Some(x) => pathAugmentation = pathAugmentation + Edge(edge.from, edge.to, x.capacity + minCap, 1)
-            case None => pathAugmentation = pathAugmentation + Edge(edge.from, edge.to, minCap, 1)
+            case Some(x) => pathAugmentation = pathAugmentation + Edge(x.to, x.from, x.capacity + minCap, 1)
+            case None => pathAugmentation = pathAugmentation + Edge(edge.to, edge.from, minCap, 1)
           }
           Edge(edge.from, edge.to, currentCap - minCap, 1)
         }).filter(_.capacity > 0)
+        println("path")
+        println(pathAugmentation)
 
         // Update the edges to include all new edges
         // Make sure not to duplicate the edges
         if(newPath.nonEmpty) {
-          newPath.foreach(e => edges + ((e.to.id, e.from.id) -> e))
+          newPath.foreach(e => edges + ((e.from.id, e.to.id) -> e))
         }
         if(pathAugmentation.nonEmpty) {
-          pathAugmentation.foreach(e => edges + ((e.to.id, e.from.id) -> e))
+          pathAugmentation.foreach(e => edges + ((e.from.id, e.to.id) -> e))
         }
         // Return the new graph
         Some((new Graph(graph.nodes, edges), minCap))

@@ -27,9 +27,9 @@ object GraphFactories {
       nodes(2) -> Map(nodes(3) -> 7, nodes(4) -> 7, nodes(5) -> 10)
     )
     val items: Map[Node, Float] = Map(
-      nodes(3) -> 5,
-      nodes(4) -> 8,
-      nodes(5) -> 6
+      nodes(3) -> 0,
+      nodes(4) -> 3,
+      nodes(5) -> 2
     )
 
     val nodeSplits = nodes.splitAt(3)
@@ -37,6 +37,18 @@ object GraphFactories {
     val edges = pairs.map(e => (e._1.id, e._2.id) -> Edge(e._1, e._2, 0,0)).toMap
 
     new Matching(buyers, items, edges)
+  }
+
+  def maxFlowTestGraph = {
+    val nodes = Seq(Node(0), Node(1), Node(2), Node(3))
+    val edges: Map[(Int,Int), Edge] = Map (
+      (0,1) -> Edge(nodes(0),nodes(1),1,0.0),
+      (1,3) -> Edge(nodes(1),nodes(3),1,0.0),
+      (0,2) -> Edge(nodes(0),nodes(2),3,0.0),
+      (1,2) -> Edge(nodes(1),nodes(2),2,0.0),
+      (2,3) -> Edge(nodes(2),nodes(3),1,0.0)
+    )
+    new Graph(nodes.toSet, edges)
   }
 
 

@@ -3,12 +3,21 @@ import scala.util.Random
 import GraphOps.{maxFlowIteration, maxFlow, contagiousInfection}
 
 object Main extends App {
-  val g = GraphFactories.testGraph1
+  val g = GraphFactories.maxFlowTestGraph
+//  println(g.getNode(3))
+  println(GraphOps.maxFlow(g, g.getNode(0).get, g.getNode(3).get))
+  g.getEdges.foreach(println)
   // Acceptability graph
-  println(g.acceptabilityGraph.getEdges.keySet)
+//  println(g.acceptabilityGraph.getEdges.keySet)
 
   // Induced prefered graph
-  println(g.inducedPreferredGraph.getEdges.keySet)
+  //  println(g.inducedPreferredGraph.getEdges.keySet)
+
+  //  g.inducedPreferredGraph.getEdges.keySet.foreach(println)
+
+
+  //  GraphOps.maxFlow(g.inducedPreferredGraph.getAugmentedGraph, g.getNode(0).get, g.getNode(10).get)
+
 }
 
 object HW1 {
