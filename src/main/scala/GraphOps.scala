@@ -76,7 +76,6 @@ object GraphOps {
     val startingGraph = new Matching(graph.buyers, startingItems, graph.getEdges)
     var g = startingGraph.inducedPreferredGraph.getAugmentedGraph
 
-
     var maxFlow = GraphOps.maxFlow(g, g.getNode(0).get, g.getNode(10).get)
     breakable {
       while(maxFlow._1 != startingItems.size) {
@@ -87,7 +86,6 @@ object GraphOps {
         startingItems = tmp ++ updatedSellersConSet
 
         if(startingItems.count(_._2 > 0) == startingItems.size) {
-          println("shit")
           startingItems = startingItems.map(i => (i._1, i._2 - 1 ))
         }
         val tmpG = new Matching(graph.buyers, startingItems, graph.getEdges)

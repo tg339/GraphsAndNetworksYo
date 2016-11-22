@@ -4,7 +4,7 @@
 		module="graphanalysis$sources_2.11"
 		revision="1.0"
 		status="integration"
-		publication="20161119121631"
+		publication="20161121212754"
 	/>
 	<configurations>
 		<conf name="compile" visibility="public" description=""/>

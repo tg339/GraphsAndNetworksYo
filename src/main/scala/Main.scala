@@ -8,8 +8,8 @@ object Main extends App {
 //  println(g.getNode(3))
 //  println(GraphOps.maxFlow(g, g.getNode(0).get, g.getNode(10).get))
 //  println(GraphOps.getConstrictedSet(g, GraphOps.connectedComponents(g, g.getNode(0).get)))
+
   val marketEq = GraphOps.getMarketEquilibrium(g)
-  println("market Items yo")
   println(marketEq.items)
   // Acceptability graph
 //  println(g.acceptabilityGraph.getEdges.keySet)
