@@ -4,23 +4,18 @@ import GraphOps.{maxFlowIteration, maxFlow, contagiousInfection}
 
 object Main extends App {
   val g = GraphFactories.testGraph1
-//  print(g.inducedPreferredGraph)
-//  println(g.getNode(3))
-//  println(GraphOps.maxFlow(g, g.getNode(0).get, g.getNode(10).get))
-//  println(GraphOps.getConstrictedSet(g, GraphOps.connectedComponents(g, g.getNode(0).get)))
-
+  // 10.a
+  println(GraphOps.getConstrictedSet(g, GraphOps.connectedComponents(g, g.getNode(0).get)))
+  // 10.b
   val marketEq = GraphOps.getMarketEquilibrium(g)
   println(marketEq.items)
-  // Acceptability graph
-//  println(g.acceptabilityGraph.getEdges.keySet)
-
-  // Induced prefered graph
-  //  println(g.inducedPreferredGraph.getEdges.keySet)
-
-  //  g.inducedPreferredGraph.getEdges.keySet.foreach(println)
+  // 11.a
+  // 11.b
+  val marketEq2 = GraphOps.getMarketEquilibrium(g)
+  println(marketEq.items)
+  // 11.c
 
 
-  //  GraphOps.maxFlow(g.inducedPreferredGraph.getAugmentedGraph, g.getNode(0).get, g.getNode(10).get)
 
 }
 

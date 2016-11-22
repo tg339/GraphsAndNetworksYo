@@ -72,28 +72,40 @@ object GraphOps {
   }
 
   def getMarketEquilibrium(graph: Matching): Matching = {
+    // Set prices to zero
     var startingItems = graph.items.map(x => x._1 -> 0.0F)
+    // Create new graph with new prices
     val startingGraph = new Matching(graph.buyers, startingItems, graph.getEdges)
+    // Get graph with additional nodes to run maxflow
     var g = startingGraph.inducedPreferredGraph.getAugmentedGraph
 
     var maxFlow = GraphOps.maxFlow(g, g.getNode(0).get, g.getNode(10).get)
+    // Do yo thang
     breakable {
       while(maxFlow._1 != startingItems.size) {
+        // Get the constricted set
         val sellersConSet = GraphOps.getConstrictedSet(g, GraphOps.connectedComponents(g, g.getNode(0).get))
         val tmp = startingItems.filterNot(x => sellersConSet.keySet.contains(x._1))
+        // Add one to all prices
         val updatedSellersConSet = sellersConSet.map(x => (x._1, x._2 + 1))
-        println(updatedSellersConSet)
         startingItems = tmp ++ updatedSellersConSet
 
+        // If all prices are greater than zero decrease by one
         if(startingItems.count(_._2 > 0) == startingItems.size) {
           startingItems = startingItems.map(i => (i._1, i._2 - 1 ))
         }
+
+        // Output the actual graph
         val tmpG = new Matching(graph.buyers, startingItems, graph.getEdges)
         g = tmpG.inducedPreferredGraph.getAugmentedGraph
         maxFlow = GraphOps.maxFlow(g, g.getNode(0).get, g.getNode(10).get)
       }
     }
     new Matching(graph.buyers, startingItems, graph.getEdges)
+  }
+
+  def clarkPivot(g: Matching) = {
+    val marketEq = GraphOps.getMarketEquilibrium(g)
   }
 
   def getConstrictedSet(graph: Matching, connectedComponent: mutable.Set[Int]) = {
