@@ -104,8 +104,69 @@ object GraphOps {
     new Matching(graph.buyers, startingItems, graph.getEdges)
   }
 
-  def clarkPivot(g: Matching) = {
-    val marketEq = GraphOps.getMarketEquilibrium(g)
+  def vcg(g: Matching) = {
+    // Get the optimal social assignment through market equilibirum
+    val marketEq = GraphOps.getMarketEquilibrium(g).inducedPreferredGraph
+    val prices = marketEq.items
+
+    val newPrices = prices.map( p => {
+      val buyerNodeId = marketEq.getEdges.find(_._1._2 == p._1.id).get._1._1
+      val otherValuationsSum = marketEq.getEdges.filterNot(_._1._1 == buyerNodeId).map(e =>{
+        val chosenItemId = e._1._2
+        val currentBuyerValuations = marketEq.buyers(marketEq.getNode(e._1._1).get)
+        currentBuyerValuations(marketEq.getNode(chosenItemId).get)
+      }).sum
+      (p._1, otherValuationsSum * -1)
+    })
+    new Matching(g.buyers, newPrices, g.getEdges)
+  }
+
+
+  def clarkPivotRule(g: Matching): Matching = {
+    // Are we converging to seller optimal market clearing prices?!?!?!?!?!?
+    val seedGraph = GraphOps.getMarketEquilibrium(g)
+    // Set all prices to zero but keep the matchings so that induced prefered uses the same price for all items
+    val seedItems = seedGraph.items.map(x => (x._1, 0.0F))
+    val marketEq = new Matching(seedGraph.buyers, seedItems, seedGraph.getEdges)
+
+    val prices = marketEq.inducedPreferredGraph.items
+
+    val globalWinningVals = prices.map( p => {
+      val itemNode = p._1
+      val buyerNode = seedGraph.getBuyerFromSeller(itemNode.id)
+      val valuation = seedGraph.getValuations(buyerNode.id)(itemNode)
+      (buyerNode, valuation)
+    })
+
+
+
+    val newPrices = prices.map(b => {
+      val itemNode = b._1
+      println("itemnode")
+      println(itemNode.id)
+      val buyerNode = seedGraph.inducedPreferredGraph.getBuyerFromSeller(itemNode.id)
+      val newGraph = marketEq.removeNode(buyerNode.id).inducedPreferredGraph.breakTie
+      println("Without Node " + buyerNode.id + " :")
+      println(newGraph.getEdges)
+      val newGraphPrices: Map[Node, Float] = newGraph.items.filter(x => newGraph.getEdges.keySet.flatMap(x => List(x._1, x._2)).contains(x._1.id))
+
+      val localWinningVals = newGraphPrices.map( p => {
+        val localItemNode = p._1
+        val newBuyerNode = newGraph.getNode(newGraph.getEdges.find(_._1._2 == localItemNode.id).get._1._1).get
+        val valuation = newGraph.buyers(newBuyerNode)(localItemNode)
+        (newBuyerNode, valuation)
+      })
+      println("Global Winning Vals:")
+      println(globalWinningVals)
+      println("Local Winning Vals")
+      println(localWinningVals)
+
+      (itemNode, localWinningVals.map(x => x._2 - globalWinningVals(x._1)).sum)
+    })
+    println(newPrices)
+
+    new Matching(g.buyers, newPrices, g.getEdges)
+
   }
 
   def getConstrictedSet(graph: Matching, connectedComponent: mutable.Set[Int]) = {
@@ -132,8 +193,7 @@ object GraphOps {
     // Find a path
     val pathSlider = graph.path(startNode, targetNode).sliding(2)
     val path = pathSlider.map(x => graph.getEdge(x.head, x.last).get).toList
-//    println(graph.getEdges)
-//    println(path)
+
     path match {
       case Nil => None
       case _ =>

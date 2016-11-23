@@ -5,15 +5,21 @@ import GraphOps.{maxFlowIteration, maxFlow, contagiousInfection}
 object Main extends App {
   val g = GraphFactories.testGraph1
   // 10.a
-  println(GraphOps.getConstrictedSet(g, GraphOps.connectedComponents(g, g.getNode(0).get)))
+//  println(GraphOps.getConstrictedSet(g, GraphOps.connectedComponents(g, g.getNode(0).get)))
   // 10.b
   val marketEq = GraphOps.getMarketEquilibrium(g)
   println(marketEq.items)
+//  println(marketEq.inducedPreferredGraph.getEdges.keySet)
+//  marketEq.inducedPreferredGraph.getEdges.foreach(println)
+//  marketEq.inducedPreferredGraph.items.foreach(println)
   // 11.a
   // 11.b
-  val marketEq2 = GraphOps.getMarketEquilibrium(g)
-  println(marketEq.items)
+  val vcgPrices = GraphOps.vcg(g)
+  println(vcgPrices.items)
   // 11.c
+  val clarkPrices = GraphOps.clarkPivotRule(g)
+  println(clarkPrices.items)
+
 
 
 
