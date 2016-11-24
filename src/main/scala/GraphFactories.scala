@@ -2,6 +2,8 @@ import java.io.File
 
 import com.github.tototoshi.csv.{CSVReader, DefaultCSVFormat}
 
+import scala.util.Random
+
 /**
   * Created by timdelisle on 10/23/16.
   */
@@ -85,6 +87,42 @@ object GraphFactories {
       (3,4) -> Edge(Node(3),Node(4),1,1.0)
     )
     new Graph(nodes.toSet, edges)
+  }
+
+  def graphFor12a = {
+    val buyersNodes = (21 to 40).map(Node)
+
+    val itemNodes = (1 to 20).map(Node(_) -> 0.0F)
+
+    val playerValues = (21 to 40).map(x => {
+      val goodValues = (1 to 20).map(i => {
+        val randomValue: Int = Random.nextInt(50)
+        itemNodes(i - 1)._1 -> (i * randomValue).toFloat
+      }).toMap
+      buyersNodes.find(_.id == x).get -> goodValues
+    }).toMap
+
+    val edges = for (x <- buyersNodes; y <- itemNodes.map(_._1)) yield (x, y)
+
+    new Matching(playerValues, itemNodes.toMap, edges.map(x => (x._1.id, x._2.id) -> Edge(x._1, x._2, 0, 0.0)).toMap)
+  }
+
+  def graphFor12c = {
+    val previousG = graphFor12a
+
+    val previousItemValues = previousG.buyers.map(_._2)
+
+    val newValuations = previousG.buyers.map(x => {
+      val valuesFromPrevContext = x._2.map(y => y._2/y._1.id)
+      val newVals = x._2.map( z => {
+        val node = z._1
+        val valuationForNode = Random.shuffle(valuesFromPrevContext).take(node.id).sum
+        (node, valuationForNode)
+      })
+      x._1 -> newVals
+    })
+
+    new Matching(newValuations, previousG.items, previousG.getEdges)
   }
 
 

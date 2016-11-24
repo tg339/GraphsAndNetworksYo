@@ -7,21 +7,26 @@ object Main extends App {
   // 10.a
 //  println(GraphOps.getConstrictedSet(g, GraphOps.connectedComponents(g, g.getNode(0).get)))
   // 10.b
-  val marketEq = GraphOps.getMarketEquilibrium(g)
-  println(marketEq.items)
-//  println(marketEq.inducedPreferredGraph.getEdges.keySet)
-//  marketEq.inducedPreferredGraph.getEdges.foreach(println)
-//  marketEq.inducedPreferredGraph.items.foreach(println)
-  // 11.a
-  // 11.b
-  val vcgPrices = GraphOps.vcg(g)
-  println(vcgPrices.items)
-  // 11.c
-  val clarkPrices = GraphOps.clarkPivotRule(g)
-  println(clarkPrices.items)
+//  val marketEq = GraphOps.getMarketEquilibrium(g)
+//  println(marketEq.items)
+//
+//  // 11.a
+//  // 11.b
+//  val vcgPrices = GraphOps.vcg(g)
+//  println(vcgPrices.items)
+//  // 11.c
+//  val clarkPrices = GraphOps.clarkPivotRule(g)
+//  println(clarkPrices.items)
 
+  // 12.a and b
+  val gFor12a = GraphFactories.graphFor12a
+  val vcgPricesFor12a = GraphOps.getMarketEquilibrium(gFor12a)
+  println(vcgPricesFor12a.items)
 
-
+  // 12.c
+  val gFor12c = GraphFactories.graphFor12c
+  val vcgPricesFor12c = GraphOps.getMarketEquilibrium(gFor12c)
+  println(vcgPricesFor12c.items)
 
 }
 

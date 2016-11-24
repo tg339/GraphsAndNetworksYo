@@ -82,14 +82,14 @@ class Matching(val buyers: Map[Node, Map[Node, Float]], val items: Map[Node, Flo
     // Gen edges from source to buyers
     // Capacity is one fo reach of these edges
     val edgeCap = 1
-    val sourceNode = Node(0)
+    val sourceNode = Node(1000001)
     val buyerEdges = this.buyers
       .map(n =>  Edge(sourceNode, n._1, edgeCap, 1.0))
       .map(n => n.ref -> n)
       .toMap
 
     // Gen Edges from items to target
-    val targetNode = Node(10)
+    val targetNode = Node(1000002)
     val sellerEdges: Map[(Int, Int), Edge] = this.items
       .map(n =>  Edge(n._1, targetNode, edgeCap, 1.0))
       .map(n => n.ref -> n)

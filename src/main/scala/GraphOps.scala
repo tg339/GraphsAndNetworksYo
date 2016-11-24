@@ -79,12 +79,12 @@ object GraphOps {
     // Get graph with additional nodes to run maxflow
     var g = startingGraph.inducedPreferredGraph.getAugmentedGraph
 
-    var maxFlow = GraphOps.maxFlow(g, g.getNode(0).get, g.getNode(10).get)
+    var maxFlow = GraphOps.maxFlow(g, g.getNode(1000001).get, g.getNode(1000002).get)
     // Do yo thang
     breakable {
       while(maxFlow._1 != startingItems.size) {
         // Get the constricted set
-        val sellersConSet = GraphOps.getConstrictedSet(g, GraphOps.connectedComponents(g, g.getNode(0).get))
+        val sellersConSet = GraphOps.getConstrictedSet(g, GraphOps.connectedComponents(g, g.getNode(1000001).get))
         val tmp = startingItems.filterNot(x => sellersConSet.keySet.contains(x._1))
         // Add one to all prices
         val updatedSellersConSet = sellersConSet.map(x => (x._1, x._2 + 1))
@@ -98,7 +98,8 @@ object GraphOps {
         // Output the actual graph
         val tmpG = new Matching(graph.buyers, startingItems, graph.getEdges)
         g = tmpG.inducedPreferredGraph.getAugmentedGraph
-        maxFlow = GraphOps.maxFlow(g, g.getNode(0).get, g.getNode(10).get)
+        maxFlow = GraphOps.maxFlow(g, g.getNode(1000001).get, g.getNode(1000002).get)
+        println(maxFlow)
       }
     }
     new Matching(graph.buyers, startingItems, graph.getEdges)
@@ -137,8 +138,6 @@ object GraphOps {
       val valuation = seedGraph.getValuations(buyerNode.id)(itemNode)
       (buyerNode, valuation)
     })
-
-
 
     val newPrices = prices.map(b => {
       val itemNode = b._1
