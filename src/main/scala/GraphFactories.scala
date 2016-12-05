@@ -41,7 +41,7 @@ object GraphFactories {
     new Matching(buyers, items, edges)
   }
 
-  def testGraph2 = {
+  def testGraph2: Matching = {
     val nodes = Seq(Node(1),Node(2),Node(3),Node(4),Node(5),Node(6))
 
     val buyers: Map[Node, Map[Node, Float]] = Map(
@@ -62,7 +62,46 @@ object GraphFactories {
     new Matching(buyers, items, edges)
   }
 
-  def maxFlowTestGraph = {
+  def graph11_1_a: Graph = {
+    val nodes = Map(
+      "A" -> Node(0),
+      "B" -> Node(1),
+      "C" -> Node(2),
+      "Z" -> Node(3)
+    )
+    val edges: Map[(Int, Int), Edge] = Map(
+      (nodes("A").id, nodes("B").id) -> Edge(nodes("A"), nodes("B"), 1, 0.0),
+      (nodes("B").id, nodes("C").id) -> Edge(nodes("B"), nodes("C"), 1, 0.0),
+      (nodes("C").id, nodes("A").id) -> Edge(nodes("C"), nodes("A"), 1, 0.0),
+      (nodes("A").id, nodes("Z").id) -> Edge(nodes("A"), nodes("Z"), 1, 0.0),
+      (nodes("Z").id, nodes("Z").id) -> Edge(nodes("Z"), nodes("Z"), 1, 0.0)
+    )
+
+    new Graph(nodes.values.toSet, edges)
+  }
+
+  def graph11_1_b: Graph = {
+    val nodes = Map(
+      "A" -> Node(0),
+      "B" -> Node(1),
+      "C" -> Node(2),
+      "Z1" -> Node(3),
+      "Z2" -> Node(4)
+    )
+    val edges: Map[(Int, Int), Edge] = Map(
+      (nodes("A").id, nodes("B").id) -> Edge(nodes("A"), nodes("B"), 1, 0.0),
+      (nodes("B").id, nodes("C").id) -> Edge(nodes("B"), nodes("C"), 1, 0.0),
+      (nodes("C").id, nodes("A").id) -> Edge(nodes("C"), nodes("A"), 1, 0.0),
+      (nodes("A").id, nodes("Z1").id) -> Edge(nodes("A"), nodes("Z1"), 1, 0.0),
+      (nodes("A").id, nodes("Z2").id) -> Edge(nodes("A"), nodes("Z2"), 1, 0.0),
+      (nodes("Z1").id, nodes("Z2").id) -> Edge(nodes("Z1"), nodes("Z2"), 1, 0.0),
+      (nodes("Z2").id, nodes("Z1").id) -> Edge(nodes("Z2"), nodes("Z1"), 1, 0.0)
+    )
+
+    new Graph(nodes.values.toSet, edges)
+  }
+
+  def maxFlowTestGraph: Graph = {
     val nodes = Seq(Node(0), Node(1), Node(2), Node(3))
     val edges: Map[(Int,Int), Edge] = Map (
       (0,1) -> Edge(nodes(0),nodes(1),1,0.0),

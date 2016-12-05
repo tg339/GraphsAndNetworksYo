@@ -11,7 +11,6 @@ object GraphOps {
     path
   }
 
-
   def breadthFirstSearch(graph: GraphLike, startNode: Node, targetNode: Node): List[Int] = {
     val parents: mutable.Map[Int, Int] = mutable.Map.empty
     val q: mutable.Queue[Node] = new mutable.Queue
@@ -71,7 +70,7 @@ object GraphOps {
     visited
   }
 
-  def getMarketEquilibrium(graph: Matching): Matching = {
+  def getMarketEquilibrium(graph: Matching) = {
     // Set prices to zero
     var startingItems = graph.items.map(x => x._1 -> 0.0F)
     // Create new graph with new prices
@@ -99,7 +98,6 @@ object GraphOps {
         val tmpG = new Matching(graph.buyers, startingItems, graph.getEdges)
         g = tmpG.inducedPreferredGraph.getAugmentedGraph
         maxFlow = GraphOps.maxFlow(g, g.getNode(1000001).get, g.getNode(1000002).get)
-        println(maxFlow)
       }
     }
     new Matching(graph.buyers, startingItems, graph.getEdges)
@@ -141,12 +139,8 @@ object GraphOps {
 
     val newPrices = prices.map(b => {
       val itemNode = b._1
-      println("itemnode")
-      println(itemNode.id)
       val buyerNode = seedGraph.inducedPreferredGraph.getBuyerFromSeller(itemNode.id)
       val newGraph = marketEq.removeNode(buyerNode.id).inducedPreferredGraph.breakTie
-      println("Without Node " + buyerNode.id + " :")
-      println(newGraph.getEdges)
       val newGraphPrices: Map[Node, Float] = newGraph.items.filter(x => newGraph.getEdges.keySet.flatMap(x => List(x._1, x._2)).contains(x._1.id))
 
       val localWinningVals = newGraphPrices.map( p => {
@@ -155,15 +149,10 @@ object GraphOps {
         val valuation = newGraph.buyers(newBuyerNode)(localItemNode)
         (newBuyerNode, valuation)
       })
-      println("Global Winning Vals:")
-      println(globalWinningVals)
-      println("Local Winning Vals")
-      println(localWinningVals)
 
       (itemNode, localWinningVals.map(x => x._2 - globalWinningVals(x._1)).sum)
     })
     println(newPrices)
-
     new Matching(g.buyers, newPrices, g.getEdges)
 
   }
@@ -186,6 +175,29 @@ object GraphOps {
       }
     }
     (maxFlow, g)
+  }
+
+  def pageRank(graph: GraphLike): Map[Int, Double] = {
+    // Inspired by
+    // https://github.com/apache/spark/blob/master/examples/src/main/scala/org/apache/spark/examples/SparkPageRank.scala
+    val nu = graph.nodes.size
+    val epsilon = 1.0/7.0
+    val iterations = 100
+
+    val links = graph.neighborhoods
+    var scores = links.mapValues(v => 1.0/nu)
+
+    for(i <- 1 to iterations) {
+      val contributions: Seq[(Node, Double)] = links.toSeq
+        .map(n => (n._2, scores(n._1))).flatMap {
+        case (children, score) =>
+          val size = children.size
+          children.toSeq.map(c => (c, score/size))
+      }
+      scores = contributions.groupBy(_._1)
+        .map(n => (n._1.id, (epsilon/nu) + (1.0 - epsilon) * n._2.map(_._2).sum))
+    }
+    scores
   }
 
   def maxFlowIteration(graph: GraphLike, startNode: Node, targetNode: Node): Option[(GraphLike, Int)] = {

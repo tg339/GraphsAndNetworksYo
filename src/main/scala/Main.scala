@@ -3,30 +3,34 @@ import scala.util.Random
 import GraphOps.{maxFlowIteration, maxFlow, contagiousInfection}
 
 object Main extends App {
-  val g = GraphFactories.testGraph1
-  // 10.a
-//  println(GraphOps.getConstrictedSet(g, GraphOps.connectedComponents(g, g.getNode(0).get)))
-  // 10.b
-//  val marketEq = GraphOps.getMarketEquilibrium(g)
-//  println(marketEq.items)
+  val references = Map(
+    "A" -> Node(0),
+    "B" -> Node(1),
+    "C" -> Node(2),
+    "Z1" -> Node(3),
+    "Z2" -> Node(4)
+  )
+
+  println("node references")
+  references.foreach(println)
+
+  println("Problem 6.a - Graph 11.1 a")
+  val g1 = GraphFactories.graph11_1_a
+  val g1Scores = GraphOps.pageRank(g1)
+  g1Scores.toSeq.sortBy(_._2).foreach(println)
+
+  println("Problem 6.a - Graph 11.1 b")
+  val g2 = GraphFactories.graph11_1_b
+  val g2Scores = GraphOps.pageRank(g2)
+  g2Scores.toSeq.sortBy(_._2).foreach(println)
+
+//  val scores = GraphOps.pageRank(g1)
+//  println(scores.values.sum)
 //
-//  // 11.a
-//  // 11.b
-//  val vcgPrices = GraphOps.vcg(g)
-//  println(vcgPrices.items)
-//  // 11.c
-//  val clarkPrices = GraphOps.clarkPivotRule(g)
-//  println(clarkPrices.items)
-
-  // 12.a and b
-  val gFor12a = GraphFactories.graphFor12a
-  val vcgPricesFor12a = GraphOps.getMarketEquilibrium(gFor12a)
-  println(vcgPricesFor12a.items)
-
-  // 12.c
-  val gFor12c = GraphFactories.graphFor12c
-  val vcgPricesFor12c = GraphOps.getMarketEquilibrium(gFor12c)
-  println(vcgPricesFor12c.items)
+  println("Problem 6.b - Facebook Graph")
+  val fbgraph = GraphFactories.fromFile("/Users/timdelisle/Downloads/facebook_combined.txt")
+  val fbscores = GraphOps.pageRank(fbgraph)
+  fbscores.toSeq.sortBy(_._2).foreach(println)
 
 }
 
@@ -93,4 +97,32 @@ object HW2 {
     val infected = contagiousInfection(graph, k, q)
     println(infected.size, k, q)
   })
+}
+
+object HW3 {
+  val g = GraphFactories.testGraph1
+  println("10.a")
+  val newG = g.inducedPreferredGraph.getAugmentedGraph
+  println(GraphOps.getConstrictedSet(newG, GraphOps.connectedComponents(newG, newG.getNode(1000001).get)))
+  println("10.b")
+  val marketEq = GraphOps.getMarketEquilibrium(g)
+  println(marketEq.items)
+
+  println("11.a")
+  println("11.b")
+  val vcgPrices = GraphOps.vcg(g)
+  println(vcgPrices.items)
+  println("11.c")
+  val clarkPrices = GraphOps.clarkPivotRule(g)
+  println(clarkPrices.items)
+
+  println("12.a and b")
+  val gFor12a = GraphFactories.graphFor12a
+  val vcgPricesFor12a = GraphOps.getMarketEquilibrium(gFor12a)
+  println(vcgPricesFor12a.items)
+
+  println("12.c")
+  val gFor12c = GraphFactories.graphFor12c
+  val vcgPricesFor12c = GraphOps.getMarketEquilibrium(gFor12c)
+  println(vcgPricesFor12c.items)
 }
